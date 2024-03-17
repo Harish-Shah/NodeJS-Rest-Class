@@ -15,6 +15,6 @@ router.post('/products', saveProduct);
 
 router.delete('/products/:id', deleteProduct);
 
-router.put('/products', updateProduct);
+router.put('/products/:id', updateProduct);
 
 module.exports = router;

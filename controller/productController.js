@@ -1,3 +1,6 @@
+const { connect } = require('mongoose');
+let product = require('../models/productModel'); // product is the model created in productModel.js file
+
 // let products = [
 //   {
 //     id: 1,
@@ -22,47 +25,76 @@
 //   },
 // ];
 
-let product = require("../models/productModel")
+let getProducts = async (req, resp) => {
+  // resp.status(200).send(products);
+  try {
+    let products = await product.find({});
+    resp.status(200).send(products);
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send('Something went wrong');
+  }
+};
 
-let getProducts = async (req, resp)=>{
-    // resp.status(200).send(products);
+let saveProduct = async (req, resp) => {
+  //   let product = req.body;
+  //   products.push(product);
+  //   resp.status(201).send(products);
+  let newProduct = req.body;
+
+  try {
+    await product.create(newProduct);
+    resp.status(201).send(await product.find({}));
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send('Something went wrong');
+  }
+};
+
+let deleteProduct = async (req, resp) => {
+  //   let newProducts = products.filter((product) => {
+  //     return product.id != req.params.id;
+  //   });
+  //   resp.status(200).send(newProducts);
+  let prodToDelete = await product.findOne({ id: req.params.id });
+  if (prodToDelete) {
     try {
-        let products = await product.find({});
-        resp.status(200).send(products);
-    } catch(error) {
-        console.log(error);
-        resp.status(500).send("Something went wrong!");
+      await product.deleteOne({ id: req.params.id }); // prodToDelete.id will work too
+      resp.status(200).send(await product.find({}));
+    } catch (error) {
+      console.log(error);
+      resp.status(500).send('Something went wrong');
     }
-}
-
-let saveProduct = (req, resp) => {
-//   let product = req.body;
-//   products.push(product);
-//   resp.status(201).send(products);
+  } else {
+    resp.status(404).send('Product not found!');
+  }
 };
 
-let deleteProduct = (req, resp) => {
-//   let newProducts = products.filter((product) => {
-//     return product.id != req.params.id;
-//   });
+let updateProduct = async (req, resp) => {
+  //   updatedProduct = req.body;
+  //   products.map((product) => {
+  //     if (product.id == updatedProduct.id) {
+  //       product.name = updatedProduct.name;
+  //       product.brand = updatedProduct.brand;
+  //       product.price = updatedProduct.price;
+  //       product.quantity = updatedProduct.quantity;
+  //     }
+  //     return product;
+  //   });
+  //   resp.status(200).send(products);
 
-//   resp.status(200).send(newProducts);
-};
-
-let updateProduct = (req, resp) => {
-//   updatedProduct = req.body;
-
-//   products.map((product) => {
-//     if (product.id == updatedProduct.id) {
-//       product.name = updatedProduct.name;
-//       product.brand = updatedProduct.brand;
-//       product.price = updatedProduct.price;
-//       product.quantity = updatedProduct.quantity;
-//     }
-//     return product;
-//   });
-
-//   resp.status(200).send(products);
+  let prodToUpdate = await product.findOne({ id: req.params.id });
+  if (prodToUpdate) {
+    try {
+      await product.updateOne({ id: req.params.id }, { $set: req.body });
+      resp.status(200).send(await product.find({ id: req.params.id })); //only showing the updated product in response
+    } catch (error) {
+      console.log(error);
+      resp.status(500).send('Something went wrong');
+    }
+  } else {
+    resp.status(404).send('Product not Found!');
+  }
 };
 
 module.exports = { getProducts, saveProduct, deleteProduct, updateProduct };
