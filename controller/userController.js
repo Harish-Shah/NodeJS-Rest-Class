@@ -14,28 +14,29 @@ let registerUser = async (req, resp) => {
         u.password = await bcrypt.hash(u.password, 10);//10 reprsent the strong value
         await user.create(u);
         // generating jwt token
-        let token = jwt.sign({ id: u.id }, "Secretkey_Anything", { expiresIn: "10h" })
+        let token = jwt.sign({ id: u.id, role: u.role }, "Secretkey_Anything", { expiresIn: "10h" })
         // resp.status(200).send(await user.findOne({ id: u.id }));
         resp.status(200).send({ token: token })
     }
 }
 
-let userLogin = async(req,resp) => {
-    let dbUser = await user.findOne({id:req.body.id});
+let userLogin = async (req, resp) => {
+    console.log("===>")
+    let dbUser = await user.findOne({ id: req.body.id });
     let u = req.body;
-
-    if(dbUser){
-        let isValidUser = await bcrypt.compare(u.password,dbUser.password);
-        if(isValidUser){
-            let token = jwt.sign({ id: dbUser.id }, "Secretkey_Anything", { expiresIn: "10h" })
-            resp.status(200).send({ token: token })
-        }else{
-            resp.status(401).send("User not Authenticated!")
+    if (dbUser) {
+        let isValidUser = await bcrypt.compare(u.password, dbUser.password);
+        if (isValidUser) {
+            //generate jwt token if password is Valid
+            let token = jwt.sign({ id: dbUser.id, role: dbUser.role }, "Secretkey_Anything", { expiresIn: "10h" })
+            resp.status(201).send({ token: token });
+        } else {
+            resp.status(401).send("User not Authenticated!Please check your credentials")
         }
-    }else{
-        resp.status(404).send("User not found!")
+    } else {
+        resp.status(404).send("User Not Found!");
     }
-    
+
 }
 
-module.exports = { registerUser,userLogin };
+module.exports = { registerUser, userLogin };

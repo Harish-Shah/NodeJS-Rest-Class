@@ -5,6 +5,10 @@ let userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    role: {
+        type: String,
+        required: true
+    },
     username: {
         type: String,
         required: true
@@ -17,17 +21,17 @@ let userSchema = mongoose.Schema({
         type: [],
         required: false
     },
-    cart:{
-        type:[],
+    cart: {
+        type: [],
         required: false
     },
-},{
-    timestamps:{
-        createdAt:"created_date",
-        updatedAt:"updated_date"
+}, {
+    timestamps: {
+        createdAt: "created_date",
+        updatedAt: "updated_date"
     }
 })
 
-let userModels = mongoose.model('userModel',userSchema);
+let userModels = mongoose.model('userModel', userSchema);
 
 module.exports = userModels;
